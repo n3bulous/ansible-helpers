@@ -24,21 +24,18 @@ init_simple() {
 }
 
 main() {
-	local args="$@"
-
-	for cmd in "$args"; do
-		case "$cmd" in
-		init-simple)
-			init_simple
-			;;
-		init-alt)
-			init_alt
-			;;
-		*)
-			abort "Invalid command: '$cmd'.\\nAvailable commands: $CMDS"
-			;;
-		esac
-	done
+	cmd=$1
+	case "$cmd" in
+	init-simple)
+		init_simple
+		;;
+	init-alt)
+		init_alt
+		;;
+	*)
+		abort "Invalid command: '$cmd'.\\nAvailable commands: $CMDS"
+		;;
+	esac
 }
 
-main "$@"
+main "$1"
