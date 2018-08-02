@@ -1,30 +1,56 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2154
+command="$1"
+
 set -ueo pipefail
 
 CMDS="init-simple init-alt"
 
+TRACE=${TRACE:-""}
+[[ "$TRACE" ]] && set -x
+
+abort() {
+	local msg="$1"
+	echo "$msg"
+	exit -1
+}
+
+# set to echo to enable debugging
+debug=${DEBUG:-""}
+case "$debug" in
+"" | echo) ;;
+
+*)
+	abort "Invalid value: $debug for DEBUG. Only empty string and echo are allowed."
+	;;
+esac
+
+run() {
+	$debug "$@"
+}
+
 init_shared() {
-	mkdir -p library module_utils filter_plugins roles
-	touch {library,module_utils,filter_plugins,roles}/.keep
-	touch site.yml
+	run mkdir -p library module_utils filter_plugins roles
+	run touch {library,module_utils,filter_plugins,roles}/.keep
+	run touch site.yml
 }
 
 init_alt() {
 	init_shared
-	mkdir -p inventories/development/{group_vars,host_vars}
-	touch inventories/development/{group_vars,host_vars}/.keep
+	run mkdir -p inventories/development/{group_vars,host_vars}
+	run touch inventories/development/{group_vars,host_vars}/.keep
 }
 
 init_simple() {
 	init_shared
-	mkdir -p group_vars host_vars
-	touch {group_vars,host_vars}/.keep
-	touch development.ini
+	run mkdir -p group_vars host_vars
+	run touch {group_vars,host_vars}/.keep
+	run touch development.ini
 }
 
 main() {
-	cmd=$1
+	local cmd=$1
 	case "$cmd" in
 	init-simple)
 		init_simple
@@ -33,9 +59,9 @@ main() {
 		init_alt
 		;;
 	*)
-		abort "Invalid command: '$cmd'.\\nAvailable commands: $CMDS"
+		abort "Invalid command: '$cmd'. Available commands: $CMDS"
 		;;
 	esac
 }
 
-main "$1"
+main "$command"
