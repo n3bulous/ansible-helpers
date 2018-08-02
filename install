@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -ueo pipefail
+
+# shellcheck disable=SC2154
+: "${install_dir=$1}"
+
+script_name="ansible-helpers"
+path_to_script="$(dirname "$0")"
+script_dir=$(cd "$path_to_script" && pwd -P)
+
+[ -d "$install_dir" ] || (echo "$install_dir does not exist" && exit 1)
+[ -w "$install_dir" ] || (echo "$install_dir is not writable, try with sudo?" && exit 1)
+
+ln -s "$script_dir/$script_name" "$install_dir"
