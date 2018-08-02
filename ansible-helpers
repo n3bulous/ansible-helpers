@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -ueo pipefail
+
+CMDS="init-simple init-alt"
+
+init_shared() {
+	mkdir -p library module_utils filter_plugins roles
+	touch {library,module_utils,filter_plugins,roles}/.keep
+	touch site.yml
+}
+
+init_alt() {
+	init_shared
+	mkdir -p inventories/development/{group_vars,host_vars}
+	touch inventories/development/{group_vars,host_vars}/.keep
+}
+
+init_simple() {
+	init_shared
+	mkdir -p group_vars host_vars
+	touch {group_vars,host_vars}/.keep
+	touch development.ini
+}
+
+main() {
+	local args="$@"
+
+	for cmd in "$args"; do
+		case "$cmd" in
+		init-simple)
+			init_simple
+			;;
+		init-alt)
+			init_alt
+			;;
+		*)
+			abort "Invalid command: '$cmd'.\\nAvailable commands: $CMDS"
+			;;
+		esac
+	done
+}
+
+main "$@"
